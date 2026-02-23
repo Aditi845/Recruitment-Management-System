@@ -1,18 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import API from "../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [isRegister, setIsRegister] = useState(false);
-
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
-    role: "candidate",
   });
 
   const handleChange = (e) => {
@@ -22,44 +19,22 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ===== REGISTER =====
-    if (isRegister) {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      const res = await API.post("/auth/login", formData);
 
-      users.push(formData);
+      localStorage.setItem("token", res.data.token);
+      login(res.data.user);
 
-      localStorage.setItem("users", JSON.stringify(users));
+      if (res.data.user.role === "recruiter")
+        navigate("/recruiter");
+      else
+        navigate("/candidate");
 
-      alert("Registered Successfully! Please login.");
-      setIsRegister(false);
-      return;
-    }
-
-    // ===== LOGIN =====
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const foundUser = users.find(
-      (u) =>
-        u.email === formData.email &&
-        u.password === formData.password
-    );
-
-    if (!foundUser) {
+    } catch (err) {
       alert("Invalid credentials");
-      return;
-    }
-
-    // ✅ LOGIN WITH CORRECT ROLE
-    login(foundUser);
-
-    // ✅ Redirect based on role
-    if (foundUser.role === "recruiter") {
-      navigate("/recruiter");
-    } else {
-      navigate("/candidate");
     }
   };
 
@@ -69,20 +44,10 @@ const Login = () => {
       <div className="bg-white p-8 rounded-xl shadow-lg w-[400px]">
 
         <h2 className="text-2xl font-bold text-center mb-6">
-          {isRegister ? "Register" : "Login"}
+          Login
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
-          {isRegister && (
-            <input
-              name="name"
-              placeholder="Full Name"
-              className="w-full border p-2 rounded"
-              onChange={handleChange}
-              required
-            />
-          )}
 
           <input
             name="email"
@@ -102,30 +67,18 @@ const Login = () => {
             required
           />
 
-          {/* ROLE SELECT ONLY DURING REGISTER */}
-          {isRegister && (
-            <select
-              name="role"
-              className="w-full border p-2 rounded"
-              onChange={handleChange}
-            >
-              <option value="candidate">Candidate</option>
-              <option value="recruiter">Recruiter</option>
-            </select>
-          )}
-
           <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            {isRegister ? "Register" : "Login"}
+            Login
           </button>
         </form>
 
         <p className="text-center mt-4">
-          {isRegister ? "Already have account?" : "New user?"}
+          Don’t have an account?
           <span
-            onClick={() => setIsRegister(!isRegister)}
-            className="text-blue-600 ml-2 cursor-pointer"
+            onClick={() => navigate("/register")}
+            className="text-blue-600 ml-2 cursor-pointer font-semibold"
           >
-            {isRegister ? "Login" : "Register"}
+            Register
           </span>
         </p>
 

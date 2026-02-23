@@ -1,29 +1,33 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import API from "../services/api";
 
-const Login = () => {
-  const { login } = useContext(AuthContext);
+const Register = () => {
   const navigate = useNavigate();
 
-  const [isRegister, setIsRegister] = useState(false);
-  const [role, setRole] = useState("candidate");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "candidate",
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const userData = {
-      name: "Demo User",
-      role: role,
-    };
-
-    login(userData);
-
-    // Redirect based on role
-    if (role === "recruiter") {
-      navigate("/recruiter");
-    } else {
-      navigate("/candidate");
+    try {
+      await API.post("/auth/register", formData);
+      alert("Registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -33,78 +37,58 @@ const Login = () => {
       <div className="bg-white p-8 rounded-xl shadow-lg w-[400px]">
 
         <h2 className="text-2xl font-bold text-center mb-6">
-          {isRegister ? "Create Account" : "Login"}
+          Create Account
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {isRegister && (
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="w-full border p-2 rounded"
-              required
-            />
-          )}
+          <input
+            name="name"
+            placeholder="Full Name"
+            className="w-full border p-2 rounded"
+            onChange={handleChange}
+            required
+          />
 
           <input
+            name="email"
             type="email"
             placeholder="Email"
             className="w-full border p-2 rounded"
+            onChange={handleChange}
             required
           />
 
           <input
+            name="password"
             type="password"
             placeholder="Password"
             className="w-full border p-2 rounded"
+            onChange={handleChange}
             required
           />
 
-          {/* ROLE SELECTION (IMPORTANT) */}
-          {isRegister && (
-            <div>
-              <p className="font-semibold mb-2">Register As:</p>
-
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    value="candidate"
-                    checked={role === "candidate"}
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                  Candidate
-                </label>
-
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    value="recruiter"
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                  Recruiter
-                </label>
-              </div>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          <select
+            name="role"
+            className="w-full border p-2 rounded"
+            onChange={handleChange}
           >
-            {isRegister ? "Register" : "Login"}
+            <option value="candidate">Register as Candidate</option>
+            <option value="recruiter">Register as Recruiter</option>
+          </select>
+
+          <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            Register
           </button>
         </form>
 
         <p className="text-center mt-4">
-          {isRegister ? "Already have an account?" : "New user?"}
-
+          Already have an account?
           <span
-            onClick={() => setIsRegister(!isRegister)}
-            className="text-blue-600 cursor-pointer ml-2"
+            onClick={() => navigate("/login")}
+            className="text-blue-600 ml-2 cursor-pointer font-semibold"
           >
-            {isRegister ? "Login" : "Register"}
+            Login
           </span>
         </p>
 
@@ -113,4 +97,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
