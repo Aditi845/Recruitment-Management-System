@@ -23,6 +23,7 @@ const Navbar = () => {
           <Link to="/companies" className="hover:text-blue-600">Companies</Link>
           <Link to="/services" className="hover:text-blue-600">Services</Link>
           <Link to="/about" className="hover:text-blue-600">About</Link>
+          <Link to="/contact" className="hover:text-blue-600">Contact</Link>
         </div>
 
         <div className="w-1/3 flex justify-end gap-4 items-center">

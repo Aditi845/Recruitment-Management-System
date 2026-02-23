@@ -12,6 +12,7 @@ import Jobs from "./pages/Jobs";
 import Companies from "./pages/Companies";
 import Services from "./pages/Services";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 import PostJob from "./pages/PostJob";
 
 /* Dashboards */
@@ -37,6 +38,7 @@ function App() {
         <Route path="/companies" element={<Companies />} />
         <Route path="/services" element={<Services />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* Recruiter Job Post */}
         <Route
