@@ -1,34 +1,34 @@
-const express = require("express");
+const router = require("express").Router();
 const {
   applyToJob,
   getMyApplications,
   getApplicationsForRecruiter,
+  getRecruiterApplications,
   updateApplicationStatus,
+  scheduleInterview,
   getCandidateStats,
 } = require("../controllers/applicationController");
-const { authMiddleware, authorizeRoles } = require("../middleware/authMiddleware");
+const { protect, allowRoles } = require("../middleware/authMiddleware");
+const { resumeUpload } = require("../middleware/uploadMiddleware");
 
-const router = express.Router();
+router.post(
+  "/job/:jobId/apply",
+  protect,
+  allowRoles("candidate"),
+  resumeUpload.single("resume"),
+  applyToJob
+);
+router.get("/me", protect, allowRoles("candidate"), getMyApplications);
+router.get("/candidate/stats", protect, allowRoles("candidate"), getCandidateStats);
 
-router.post("/job/:jobId", authMiddleware, authorizeRoles("candidate"), applyToJob);
-router.get("/me", authMiddleware, authorizeRoles("candidate"), getMyApplications);
-router.get(
-  "/dashboard/candidate/stats",
-  authMiddleware,
-  authorizeRoles("candidate", "admin"),
-  getCandidateStats
-);
-router.get(
-  "/job/:jobId",
-  authMiddleware,
-  authorizeRoles("recruiter", "admin"),
-  getApplicationsForRecruiter
-);
+router.get("/recruiter/all", protect, allowRoles("recruiter", "admin"), getRecruiterApplications);
+router.get("/job/:jobId", protect, allowRoles("recruiter", "admin"), getApplicationsForRecruiter);
+router.patch("/:applicationId/status", protect, allowRoles("recruiter", "admin"), updateApplicationStatus);
 router.patch(
-  "/:applicationId/status",
-  authMiddleware,
-  authorizeRoles("recruiter", "admin"),
-  updateApplicationStatus
+  "/:applicationId/interview",
+  protect,
+  allowRoles("recruiter", "admin"),
+  scheduleInterview
 );
 
 module.exports = router;
