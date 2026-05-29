@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
     },
     company: { type: mongoose.Schema.Types.ObjectId, ref: "Company", default: null },
     candidateProfile: { type: candidateProfileSchema, default: () => ({}) },
+    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
   },
   { timestamps: true }
 );

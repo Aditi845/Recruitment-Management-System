@@ -2,9 +2,24 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const app = express();
+
+// Security middlewares
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Increased for development
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/", limiter);
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +31,7 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/companies", require("./routes/companyRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/contact", require("./routes/contactRoutes"));
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 

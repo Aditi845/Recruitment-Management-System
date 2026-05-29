@@ -1,5 +1,5 @@
 const express = require("express");
-const { getMyProfile, updateCandidateProfile, getCandidateProfileById } = require("../controllers/userController");
+const { getMyProfile, updateCandidateProfile, getCandidateProfileById, toggleSavedJob } = require("../controllers/userController");
 const { protect, allowRoles } = require("../middleware/authMiddleware");
 const { resumeUpload, profilePhotoUpload } = require("../middleware/uploadMiddleware");
 
@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/me", protect, getMyProfile);
 router.put("/me/candidate-profile", protect, allowRoles("candidate", "admin"), updateCandidateProfile);
 router.get("/candidate/:id", protect, allowRoles("recruiter", "admin"), getCandidateProfileById);
+router.put("/me/saved-jobs", protect, toggleSavedJob);
 
 router.post(
   "/me/candidate-profile/resume",

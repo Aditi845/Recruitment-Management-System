@@ -5,36 +5,48 @@ let transporter = null;
 const getTransporter = () => {
   if (transporter) return transporter;
 
-  if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-    transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: Number(process.env.EMAIL_PORT || 587),
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    return null;
   }
+
+  transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE || 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
 
   return transporter;
 };
 
-const sendEmail = async ({ to, subject, text }) => {
+const sendEmail = async ({ to, subject, text, html, replyTo, attachments }) => {
   const mailer = getTransporter();
 
-  // Simple fallback for local development if SMTP is not configured.
   if (!mailer) {
-    console.log("[EMAIL MOCK]", { to, subject, text });
-    return;
+    console.warn("[EMAIL NOT CONFIGURED]", {
+      to,
+      subject,
+      requiredEnv: ["EMAIL_USER", "EMAIL_PASS"],
+    });
+    return { sent: false, skipped: true };
   }
 
-  await mailer.sendMail({
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  });
+  try {
+    const info = await mailer.sendMail({
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to,
+      subject,
+      text,
+      html,
+      replyTo,
+      attachments
+    });
+    return { sent: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("[EMAIL ERROR]", error);
+    throw error;
+  }
 };
 
 module.exports = sendEmail;

@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password").populate("company");
+    const user = await User.findById(req.user._id).select("-password").populate("company").populate("savedJobs");
     res.json({ user });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -54,6 +54,28 @@ exports.getCandidateProfileById = async (req, res) => {
     if (user.role !== "candidate") return res.status(400).json({ message: "User is not a candidate" });
 
     res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.toggleSavedJob = async (req, res) => {
+  try {
+    const { jobId } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isSaved = user.savedJobs.includes(jobId);
+    
+    if (isSaved) {
+      user.savedJobs = user.savedJobs.filter(id => id.toString() !== jobId.toString());
+    } else {
+      user.savedJobs.push(jobId);
+    }
+    
+    await user.save();
+    res.json({ message: isSaved ? "Job removed from saved" : "Job saved successfully", savedJobs: user.savedJobs });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

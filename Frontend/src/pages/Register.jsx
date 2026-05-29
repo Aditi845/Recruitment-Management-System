@@ -11,6 +11,8 @@ const Register = () => {
     password: "",
     role: "candidate",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,6 +23,11 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!agree) {
+      alert("Please accept the terms to continue");
+      return;
+    }
 
     try {
       await API.post("/auth/register", formData);
@@ -61,12 +68,21 @@ const Register = () => {
 
           <input
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="w-full border p-2 rounded"
             onChange={handleChange}
             required
           />
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+            />
+            Show password
+          </label>
 
           <select
             name="role"
@@ -76,6 +92,15 @@ const Register = () => {
             <option value="candidate">Register as Candidate</option>
             <option value="recruiter">Register as Recruiter</option>
           </select>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+            />
+            I agree to the terms and privacy policy
+          </label>
 
           <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
             Register

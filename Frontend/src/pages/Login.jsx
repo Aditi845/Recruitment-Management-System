@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import API from "../services/api";
@@ -9,12 +9,22 @@ const Login = () => {
 
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     role: "candidate",
   });
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberEmail");
+    if (savedEmail) {
+      setFormData((prev) => ({ ...prev, email: savedEmail }));
+      setRememberEmail(true);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -45,6 +55,12 @@ const Login = () => {
         setAuthToken(res.data.token);
         login(res.data.user);
         redirectByRole(res.data.user.role);
+      }
+
+      if (rememberEmail) {
+        localStorage.setItem("rememberEmail", formData.email);
+      } else {
+        localStorage.removeItem("rememberEmail");
       }
     } catch (err) {
       alert(err.response?.data?.message || "Request failed");
@@ -84,13 +100,34 @@ const Login = () => {
 
           <input
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             className="w-full border p-2 rounded"
             onChange={handleChange}
             value={formData.password}
             required
           />
+
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={(e) => setShowPassword(e.target.checked)}
+              />
+              Show password
+            </label>
+            {!isRegister && (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberEmail}
+                  onChange={(e) => setRememberEmail(e.target.checked)}
+                />
+                Remember email
+              </label>
+            )}
+          </div>
 
           {isRegister && (
             <select

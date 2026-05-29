@@ -1,4 +1,6 @@
+# =========================
 # Logs
+# =========================
 logs
 *.log
 npm-debug.log*
@@ -7,18 +9,98 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# =========================
+# Node Modules
+# =========================
+node_modules/
+Backend/node_modules/
+Frontend/node_modules/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+Backend/.env
+Frontend/.env
+
+# =========================
+# Build Files
+# =========================
+dist/
+build/
+dist-ssr/
+
+Frontend/dist/
+Frontend/build/
+
+# =========================
+# Uploads
+# =========================
+Backend/uploads/
+uploads/
+
+# =========================
+# Local Files
+# =========================
 *.local
 
-# Editor directories and files
+# =========================
+# VS Code & IDE Files
+# =========================
 .vscode/*
 !.vscode/extensions.json
-.idea
+
+.idea/
 .DS_Store
+
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# =========================
+# OS Generated Files
+# =========================
+Thumbs.db
+desktop.ini
+
+# =========================
+# Temporary Files
+# =========================
+tmp/
+temp/
+
+# =========================
+# PM2
+# =========================
+.pm2/
+
+# =========================
+# Coverage
+# =========================
+coverage/
+
+# =========================
+# Cache
+# =========================
+.cache/
+.parcel-cache/
+
+# =========================
+# Vite
+# =========================
+vite.svg
+
+# =========================
+# Runtime Data
+# =========================
+pids
+*.pid
+*.seed
+*.pid.lock

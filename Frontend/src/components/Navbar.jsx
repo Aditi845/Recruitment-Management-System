@@ -31,6 +31,8 @@ const Navbar = () => {
             <>
               {user.role === "recruiter" ? (
                 <Link to="/recruiter" className="bg-blue-600 text-white px-4 py-2 rounded">Dashboard</Link>
+              ) : user.role === "admin" ? (
+                <Link to="/admin" className="bg-blue-600 text-white px-4 py-2 rounded">Dashboard</Link>
               ) : (
                 <Link to="/candidate" className="bg-blue-600 text-white px-4 py-2 rounded">Dashboard</Link>
               )}

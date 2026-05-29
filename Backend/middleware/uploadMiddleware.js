@@ -22,12 +22,12 @@ const createStorage = (folder) =>
 
 const pdfOnly = (_req, file, cb) => {
   if (file.mimetype === "application/pdf") return cb(null, true);
-  cb(new Error("Only PDF files are allowed."));
+  cb(new Error("Upload failed: Only PDF format is accepted for resumes."));
 };
 
 const imageOnly = (_req, file, cb) => {
   if (file.mimetype.startsWith("image/")) return cb(null, true);
-  cb(new Error("Only image files are allowed."));
+  cb(new Error("Upload failed: Only image formats (JPG, PNG) are accepted."));
 };
 
 const resumeUpload = multer({ storage: createStorage("resumes"), fileFilter: pdfOnly });

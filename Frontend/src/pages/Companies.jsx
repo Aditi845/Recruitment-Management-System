@@ -76,6 +76,7 @@ const Companies = () => {
   const [ratingInput, setRatingInput] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [viewMode, setViewMode] = useState("all");
 
   const loadCompanies = async () => {
     try {
@@ -151,6 +152,12 @@ const Companies = () => {
       if (sortBy === "rating") return (b.avgRating || 0) - (a.avgRating || 0);
       return (a.name || "").localeCompare(b.name || "");
     });
+
+  const visibleCompanies = viewMode === "all"
+    ? filteredCompanies
+    : viewMode === "topRated"
+    ? [...filteredCompanies].sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0)).slice(0, 6)
+    : [...filteredCompanies].sort((a, b) => (b.followersCount || 0) - (a.followersCount || 0)).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-gray-100 p-10 space-y-8">
@@ -247,12 +254,33 @@ const Companies = () => {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setViewMode("all")}
+          className={`px-4 py-2 rounded ${viewMode === "all" ? "bg-blue-600 text-white" : "border"}`}
+        >
+          All Companies
+        </button>
+        <button
+          onClick={() => setViewMode("topRated")}
+          className={`px-4 py-2 rounded ${viewMode === "topRated" ? "bg-blue-600 text-white" : "border"}`}
+        >
+          Top Rated
+        </button>
+        <button
+          onClick={() => setViewMode("mostFollowed")}
+          className={`px-4 py-2 rounded ${viewMode === "mostFollowed" ? "bg-blue-600 text-white" : "border"}`}
+        >
+          Most Followed
+        </button>
+      </div>
+
       <div className="text-sm text-gray-600">
-        Showing {filteredCompanies.length} of {companies.length} companies
+        Showing {visibleCompanies.length} of {companies.length} companies
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {filteredCompanies.map((c) => (
+        {visibleCompanies.map((c) => (
           <div key={c._id} className="bg-white p-6 rounded-xl shadow">
             <div className="flex items-center gap-3 mb-3">
               {c.logo ? (
